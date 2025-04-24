@@ -31,7 +31,9 @@ curl -X POST "http://localhost:8000/classify" \
 -H "Content-Type: application/json" \
 -d '{"email_body":"Hello, my name is John Doe..."}'
 
-API Response Format
+
+## API Response Format
+
 json
 {
   "input_email_body": "original text",
