@@ -1,40 +1,29 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List
-from models import LSTMEmailClassifier
+from models import EmailClassifier
 from utils import PIIMasker
+import joblib
 
 app = FastAPI()
+
+# Load models
 masker = PIIMasker()
-classifier = LSTMEmailClassifier()
+classifier = EmailClassifier.load('email_classifier.joblib')
 
 class EmailRequest(BaseModel):
-    email_body: str
+    text: str
 
-class MaskedEntity(BaseModel):
-    position: List[int]
-    classification: str
-    entity: str
-
-class EmailResponse(BaseModel):
-    input_email_body: str
-    list_of_masked_entities: List[MaskedEntity]
-    masked_email: str
-    category_of_the_email: str
-
-@app.post("/classify", response_model=EmailResponse)
+@app.post("/classify")
 async def classify_email(request: EmailRequest):
-    try:
-        masking_result = masker.mask_email(request.email_body)
-        category = classifier.predict(masking_result["masked_email"])
-        return {
-            "input_email_body": request.email_body,
-            "list_of_masked_entities": [
-                {"position": e["position"], "classification": e["classification"], "entity": e["entity"]}
-                for e in masking_result["entities"]
-            ],
-            "masked_email": masking_result["masked_email"],
-            "category_of_the_email": category
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    """API endpoint for email classification"""
+    masked = masker.mask(request.text)
+    category = classifier.predict(masked['text'])
+    return {
+        "category": category,
+        "masked_text": masked['text'],
+        "entities": masked['entities']
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
