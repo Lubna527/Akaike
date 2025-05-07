@@ -1,5 +1,5 @@
-###### Akaike
-###### Email PII Masking & Classification
+## Akaike
+## Email PII Masking & Classification
 
 Automatically detect and mask PII in emails, then classify them by category.
 
