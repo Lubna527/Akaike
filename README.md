@@ -40,3 +40,5 @@ Training data should be a CSV with columns:
 - `email`: Raw email text
 - `type`: Category label
 
+## Gardio Clickable Test Link
+[![Gardio_Link]](https://69cb9d6d2593673c13.gradio.live)
